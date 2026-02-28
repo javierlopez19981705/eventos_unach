@@ -5,17 +5,17 @@ import 'package:flutter/material.dart';
 /// en la identidad institucional de la Universidad.
 class AppTheme {
   // Colores principales de la app
-  static const Color primaryColor = Color(0xFF1B5E20);
-  static const Color secondaryColor = Color(0xFF00695C);
-  static const Color tertiaryColor = Color(0xFF0D47A1);
+  static const Color primaryColor = Color.fromRGBO(0, 45, 100, 1);
+  static const Color secondaryColor = Color.fromARGB(255, 0, 23, 50);
+  static const Color tertiaryColor = Color.fromRGBO(220, 160, 12, 1);
   static const Color surfaceColor = Color(0xFFF5F5F5);
   static const Color errorColor = Color(0xFFB00020);
 
   /// Esquema de colores claro basado en Material 3
   static ColorScheme get colorScheme => ColorScheme.fromSeed(
-    seedColor: primaryColor,
-    secondary: secondaryColor,
-    tertiary: tertiaryColor,
+    seedColor: const Color.fromRGBO(0, 45, 100, 1),
+    secondary: const Color.fromARGB(255, 0, 23, 50),
+    tertiary: const Color.fromRGBO(220, 160, 12, 1),
     surface: surfaceColor,
     error: errorColor,
     brightness: Brightness.light,

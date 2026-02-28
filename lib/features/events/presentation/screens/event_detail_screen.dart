@@ -117,6 +117,11 @@ class EventDetailScreen extends StatelessWidget {
                       label: 'Fecha',
                       value: dateFormat.format(event.date),
                     ),
+                    _InfoRow(
+                      icon: Icons.calendar_today_rounded,
+                      label: 'Fecha fin',
+                      value: dateFormat.format(event.dateEnd),
+                    ),
                     const Divider(),
                     _InfoRow(
                       icon: Icons.login_rounded,

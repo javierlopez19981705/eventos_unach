@@ -55,6 +55,7 @@ class EventProvider extends ChangeNotifier {
   Future<bool> createEvent({
     required String name,
     required DateTime date,
+    required DateTime dateEnd,
     required TimeOfDay entryTime,
     required TimeOfDay exitTime,
   }) async {
@@ -67,6 +68,7 @@ class EventProvider extends ChangeNotifier {
         id: _uuid.v4(),
         name: name,
         date: date,
+        dateEnd: dateEnd,
         entryTimeMinutes: Event.timeOfDayToMinutes(entryTime),
         exitTimeMinutes: Event.timeOfDayToMinutes(exitTime),
       );

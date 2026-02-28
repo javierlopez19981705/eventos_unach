@@ -1,9 +1,11 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// Manual Hive TypeAdapter para Event
 
 part of 'event_model.dart';
 
-/// Adaptador de Hive para serializar/deserializar Event
+// **************************************************************************
+// TypeAdapterGenerator
+// **************************************************************************
+
 class EventAdapter extends TypeAdapter<Event> {
   @override
   final int typeId = 0;
@@ -18,9 +20,10 @@ class EventAdapter extends TypeAdapter<Event> {
       id: fields[0] as String,
       name: fields[1] as String,
       date: fields[2] as DateTime,
+      dateEnd: fields[7] as DateTime,
       entryTimeMinutes: fields[3] as int,
       exitTimeMinutes: fields[4] as int,
-      attendanceRecords: (fields[5] as List).cast<AttendanceRecord>(),
+      attendanceRecords: (fields[5] as List?)?.cast<AttendanceRecord>(),
       isCompleted: fields[6] as bool,
     );
   }
@@ -28,7 +31,7 @@ class EventAdapter extends TypeAdapter<Event> {
   @override
   void write(BinaryWriter writer, Event obj) {
     writer
-      ..writeByte(7) // número de campos
+      ..writeByte(8)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -42,7 +45,9 @@ class EventAdapter extends TypeAdapter<Event> {
       ..writeByte(5)
       ..write(obj.attendanceRecords)
       ..writeByte(6)
-      ..write(obj.isCompleted);
+      ..write(obj.isCompleted)
+      ..writeByte(7)
+      ..write(obj.dateEnd);
   }
 
   @override

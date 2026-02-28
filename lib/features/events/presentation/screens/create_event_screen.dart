@@ -18,6 +18,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   final _nameController = TextEditingController();
 
   DateTime? _selectedDate;
+  DateTime? _selectedEndDate;
   TimeOfDay? _entryTime;
   TimeOfDay? _exitTime;
   bool _isSaving = false;
@@ -39,6 +40,20 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     );
     if (picked != null) {
       setState(() => _selectedDate = picked);
+    }
+  }
+
+  /// Muestra el selector de fecha de finalización
+  Future<void> _selectEndDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2030),
+      locale: const Locale('es', 'MX'),
+    );
+    if (picked != null) {
+      setState(() => _selectedEndDate = picked);
     }
   }
 
@@ -83,6 +98,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     final success = await provider.createEvent(
       name: _nameController.text.trim(),
       date: _selectedDate!,
+      dateEnd: _selectedEndDate!,
       entryTime: _entryTime!,
       exitTime: _exitTime!,
     );
@@ -161,6 +177,18 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                     : null,
                 placeholder: 'Seleccionar fecha',
                 onTap: _selectDate,
+              ),
+              const SizedBox(height: 20),
+
+              // Campo: Fecha de finalización
+              _DateTimeSelector(
+                icon: Icons.calendar_today_rounded,
+                label: 'Fecha de Finalización',
+                value: _selectedEndDate != null
+                    ? dateFormat.format(_selectedEndDate!)
+                    : null,
+                placeholder: 'Seleccionar fecha',
+                onTap: _selectEndDate,
               ),
               const SizedBox(height: 20),
 

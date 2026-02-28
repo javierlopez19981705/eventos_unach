@@ -1,9 +1,11 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// Manual Hive TypeAdapter para AttendanceRecord
 
 part of 'attendance_record_model.dart';
 
-/// Adaptador de Hive para serializar/deserializar AttendanceRecord
+// **************************************************************************
+// TypeAdapterGenerator
+// **************************************************************************
+
 class AttendanceRecordAdapter extends TypeAdapter<AttendanceRecord> {
   @override
   final int typeId = 1;
@@ -24,7 +26,7 @@ class AttendanceRecordAdapter extends TypeAdapter<AttendanceRecord> {
   @override
   void write(BinaryWriter writer, AttendanceRecord obj) {
     writer
-      ..writeByte(3) // número de campos
+      ..writeByte(3)
       ..writeByte(0)
       ..write(obj.studentId)
       ..writeByte(1)

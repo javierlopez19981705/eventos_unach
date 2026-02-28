@@ -20,17 +20,10 @@ class AttendanceScreen extends StatefulWidget {
 
 class _AttendanceScreenState extends State<AttendanceScreen> {
   late Timer _clockTimer;
-  String _currentTime = '';
 
   @override
   void initState() {
     super.initState();
-    _updateTime();
-    // Actualizar el reloj cada segundo
-    _clockTimer = Timer.periodic(
-      const Duration(seconds: 1),
-      (_) => _updateTime(),
-    );
 
     // Iniciar sesión de asistencia
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -50,13 +43,6 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   void dispose() {
     _clockTimer.cancel();
     super.dispose();
-  }
-
-  /// Actualiza la hora actual
-  void _updateTime() {
-    setState(() {
-      _currentTime = DateFormat('HH:mm:ss').format(DateTime.now());
-    });
   }
 
   /// Muestra diálogo para agregar alumno manualmente
@@ -204,16 +190,6 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
             ),
             child: Column(
               children: [
-                // Reloj en tiempo real
-                Text(
-                  _currentTime,
-                  style: theme.textTheme.displayMedium?.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'monospace',
-                  ),
-                ),
-                const SizedBox(height: 8),
                 Text(
                   'Entrada: ${event.entryTime.format(context)} — Salida: ${event.exitTime.format(context)}',
                   style: TextStyle(

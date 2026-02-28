@@ -36,10 +36,14 @@ class Event extends HiveObject {
   @HiveField(6)
   final bool isCompleted;
 
+  @HiveField(7)
+  final DateTime dateEnd;
+
   Event({
     required this.id,
     required this.name,
     required this.date,
+    required this.dateEnd,
     required this.entryTimeMinutes,
     required this.exitTimeMinutes,
     List<AttendanceRecord>? attendanceRecords,
@@ -64,6 +68,7 @@ class Event extends HiveObject {
     String? id,
     String? name,
     DateTime? date,
+    DateTime? dateEnd,
     int? entryTimeMinutes,
     int? exitTimeMinutes,
     List<AttendanceRecord>? attendanceRecords,
@@ -73,6 +78,7 @@ class Event extends HiveObject {
       id: id ?? this.id,
       name: name ?? this.name,
       date: date ?? this.date,
+      dateEnd: dateEnd ?? this.dateEnd,
       entryTimeMinutes: entryTimeMinutes ?? this.entryTimeMinutes,
       exitTimeMinutes: exitTimeMinutes ?? this.exitTimeMinutes,
       attendanceRecords: attendanceRecords ?? this.attendanceRecords,
