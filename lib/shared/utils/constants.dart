@@ -11,7 +11,6 @@ class AppConstants {
   static const String attendanceRoute = '/events/:id/attendance';
   static const String diplomaRoute = '/diploma';
   static const String qrScannerRoute = '/events/:id/attendance/scanner';
-  static const String generateQrRoute = '/generate-qr';
 
   // Nombre de la aplicación
   static const String appName = 'Eventos UNACH';

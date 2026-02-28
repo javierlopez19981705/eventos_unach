@@ -45,69 +45,6 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     super.dispose();
   }
 
-  /// Muestra diálogo para agregar alumno manualmente
-  void _showManualAddDialog() {
-    final idController = TextEditingController();
-    final nameController = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Agregar Alumno'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: idController,
-              decoration: const InputDecoration(
-                labelText: 'ID / Matrícula',
-                prefixIcon: Icon(Icons.badge_rounded),
-              ),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: nameController,
-              decoration: const InputDecoration(
-                labelText: 'Nombre Completo',
-                prefixIcon: Icon(Icons.person_rounded),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancelar'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              if (idController.text.isNotEmpty &&
-                  nameController.text.isNotEmpty) {
-                final provider = context.read<AttendanceProvider>();
-                final registered = provider.registerStudentManually(
-                  idController.text.trim(),
-                  nameController.text.trim(),
-                );
-                Navigator.of(ctx).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      registered
-                          ? '✅ Alumno registrado'
-                          : '⚠️ El alumno ya está registrado',
-                    ),
-                    backgroundColor: registered ? Colors.green : Colors.orange,
-                  ),
-                );
-              }
-            },
-            child: const Text('Agregar'),
-          ),
-        ],
-      ),
-    );
-  }
-
   /// Guarda la asistencia y cierra el evento
   Future<void> _saveAndClose() async {
     final attendanceProvider = context.read<AttendanceProvider>();
@@ -239,17 +176,6 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: theme.colorScheme.primary,
                       foregroundColor: theme.colorScheme.onPrimary,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: _showManualAddDialog,
-                    icon: const Icon(Icons.person_add_rounded),
-                    label: const Text('Manual'),
-                    style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 14),
                     ),
                   ),

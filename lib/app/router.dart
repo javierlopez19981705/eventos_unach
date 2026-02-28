@@ -7,7 +7,6 @@ import 'package:eventos_unach/features/events/presentation/screens/saved_events_
 import 'package:eventos_unach/features/events/presentation/screens/event_detail_screen.dart';
 import 'package:eventos_unach/features/attendance/presentation/screens/attendance_screen.dart';
 import 'package:eventos_unach/features/attendance/presentation/screens/qr_scanner_screen.dart';
-import 'package:eventos_unach/features/attendance/presentation/screens/generate_qr_screen.dart';
 import 'package:eventos_unach/features/diploma/presentation/screens/diploma_screen.dart';
 
 /// Configuración de rutas de la aplicación usando GoRouter.
@@ -64,13 +63,6 @@ final GoRouter appRouter = GoRouter(
         final eventId = state.pathParameters['id']!;
         return QrScannerScreen(eventId: eventId);
       },
-    ),
-
-    // Generar QR para alumno
-    GoRoute(
-      path: '/generate-qr',
-      name: 'generateQr',
-      builder: (context, state) => const GenerateQrScreen(),
     ),
 
     // Pantalla de diplomas

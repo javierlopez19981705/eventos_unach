@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:eventos_unach/features/attendance/data/models/attendance_record_model.dart';
 import 'package:eventos_unach/features/attendance/data/models/student_model.dart';
 
+import '../../../shared/utils/extensions_date.dart';
+
 /// Provider que gestiona el estado de la sesión de asistencia activa.
 /// Controla la lista de alumnos registrados durante un evento en curso.
 class AttendanceProvider extends ChangeNotifier {
@@ -38,8 +40,11 @@ class AttendanceProvider extends ChangeNotifier {
   bool registerStudent(Student student) {
     // Verificar si ya está registrado
     final alreadyRegistered = _currentRecords.any(
-      (r) => r.studentId == student.id,
+      (r) =>
+          r.studentId == student.id &&
+          r.scannedAt.formattedDate == DateTime.now().formattedDate,
     );
+
     if (alreadyRegistered) {
       return false; // Ya registrado
     }
@@ -53,11 +58,6 @@ class AttendanceProvider extends ChangeNotifier {
     _currentRecords.add(record);
     notifyListeners();
     return true;
-  }
-
-  /// Registra un alumno manualmente (sin QR)
-  bool registerStudentManually(String id, String name) {
-    return registerStudent(Student(id: id, name: name));
   }
 
   /// Elimina un registro de asistencia de la sesión actual

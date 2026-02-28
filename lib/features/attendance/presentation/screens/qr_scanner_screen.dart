@@ -61,9 +61,7 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text(
-              '❌ QR no válido. Formato esperado: {"id":"...","name":"..."}',
-            ),
+            content: Text('❌ QR no válido.'),
             backgroundColor: Colors.red,
             duration: Duration(seconds: 2),
           ),
