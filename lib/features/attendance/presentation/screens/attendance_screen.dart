@@ -57,7 +57,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
           backgroundColor: Colors.green,
         ),
       );
-      context.go('/events');
+      context.pop();
     }
   }
 
