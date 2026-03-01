@@ -35,10 +35,6 @@ class Student extends HiveObject {
   @HiveField(6)
   final String turno;
 
-  /// QR del alumno
-  @HiveField(7)
-  final String qr;
-
   Student({
     required this.id,
     required this.name,
@@ -47,7 +43,6 @@ class Student extends HiveObject {
     required this.matriculation,
     required this.career,
     required this.turno,
-    required this.qr,
   });
 
   /// Convierte los datos del alumno a JSON string (para codificar en QR)
@@ -66,7 +61,6 @@ class Student extends HiveObject {
       matriculation: data['matriculation'] as String,
       career: data['career'] as String,
       turno: data['turno'] as String,
-      qr: data['qr'] as String,
     );
   }
 
@@ -79,7 +73,6 @@ class Student extends HiveObject {
     'matriculation': matriculation,
     'career': career,
     'turno': turno,
-    'qr': qr,
   };
 
   /// Crea desde mapa JSON
@@ -92,7 +85,6 @@ class Student extends HiveObject {
       matriculation: json['matriculation'] as String,
       career: json['career'] as String,
       turno: json['turno'] as String,
-      qr: json['qr'] as String,
     );
   }
 }

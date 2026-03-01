@@ -234,11 +234,11 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                           ),
                         ),
                         title: Text(
-                          record.student.name,
+                          '${record.student.name} ${record.student.lastNameP} ${record.student.lastNameM}\n${record.student.career} - ${record.student.turno}',
                           style: const TextStyle(fontWeight: FontWeight.w600),
                         ),
                         subtitle: Text(
-                          'ID: ${record.student.id} • ${DateFormat('HH:mm').format(record.scannedAt)}',
+                          '${record.student.matriculation} \n ${DateFormat('dd/MM/yyyy hh:mm a').format(record.scannedAt)}',
                         ),
                         trailing: IconButton(
                           icon: const Icon(

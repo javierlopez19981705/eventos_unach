@@ -18,9 +18,9 @@ class AppProviders {
         ChangeNotifierProvider<EventProvider>(
           create: (_) => EventProvider(eventRepository)..loadEvents(),
         ),
-        // Provider de asistencia (sesión activa)
+        // Provider de asistencia (sesión activa, persiste registros)
         ChangeNotifierProvider<AttendanceProvider>(
-          create: (_) => AttendanceProvider(),
+          create: (_) => AttendanceProvider(eventRepository),
         ),
       ],
       child: child,

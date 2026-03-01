@@ -193,10 +193,13 @@ class EventDetailScreen extends StatelessWidget {
                             ),
                           ),
                         ),
-                        title: Text(record.student.name),
-                        subtitle: Text('ID: ${record.student.id}'),
+                        title: Text(
+                          '${record.student.name} ${record.student.lastNameP} ${record.student.lastNameM}\n${record.student.career} - ${record.student.turno}',
+                          style: const TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                        subtitle: Text(record.student.matriculation),
                         trailing: Text(
-                          DateFormat('HH:mm').format(record.scannedAt),
+                          '${DateFormat('dd/MM/yyyy').format(record.scannedAt)}\n${DateFormat('hh:mm a').format(record.scannedAt)}',
                           style: theme.textTheme.bodySmall,
                         ),
                       ),

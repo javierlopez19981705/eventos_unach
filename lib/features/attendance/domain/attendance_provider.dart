@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:eventos_unach/features/attendance/data/models/attendance_record_model.dart';
 import 'package:eventos_unach/features/attendance/data/models/student_model.dart';
 import 'package:eventos_unach/features/events/data/models/event_model.dart';
+import 'package:eventos_unach/features/events/data/repositories/event_repository.dart';
 
 import '../../../shared/utils/extensions_date.dart';
 
@@ -19,10 +20,15 @@ enum RegistrationResult {
 
 /// Provider que gestiona el estado de la sesión de asistencia activa.
 /// Controla la lista de alumnos registrados durante un evento en curso.
+/// Persiste los registros en Hive después de cada cambio para no perder datos.
 class AttendanceProvider extends ChangeNotifier {
+  final EventRepository _repository;
+
   List<AttendanceRecord> _currentRecords = [];
   bool _isSessionActive = false;
   String? _activeEventId;
+
+  AttendanceProvider(this._repository);
 
   // --- Getters ---
 
@@ -88,6 +94,7 @@ class AttendanceProvider extends ChangeNotifier {
     final record = AttendanceRecord(student: student, scannedAt: now);
 
     _currentRecords.add(record);
+    _persistRecords();
     notifyListeners();
     return RegistrationResult.success;
   }
@@ -95,6 +102,7 @@ class AttendanceProvider extends ChangeNotifier {
   /// Elimina un registro de asistencia de la sesión actual
   void removeRecord(String studentId) {
     _currentRecords.removeWhere((r) => r.student.id == studentId);
+    _persistRecords();
     notifyListeners();
   }
 
@@ -114,5 +122,19 @@ class AttendanceProvider extends ChangeNotifier {
     _activeEventId = null;
     _currentRecords = [];
     notifyListeners();
+  }
+
+  /// Guarda los registros actuales en Hive asociados al evento activo.
+  /// Se ejecuta después de cada registro o eliminación.
+  Future<void> _persistRecords() async {
+    if (_activeEventId == null) return;
+    try {
+      await _repository.updateAttendance(
+        _activeEventId!,
+        List<AttendanceRecord>.from(_currentRecords),
+      );
+    } catch (e) {
+      debugPrint('Error al persistir registros de asistencia: $e');
+    }
   }
 }
