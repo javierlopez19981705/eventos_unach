@@ -1,30 +1,42 @@
 import 'dart:convert';
+import 'package:hive/hive.dart';
+
+part 'student_model.g.dart';
 
 /// Modelo simple que representa un alumno.
 /// Se usa para codificar/decodificar datos en códigos QR.
-class Student {
+@HiveType(typeId: 2)
+class Student extends HiveObject {
   /// Identificador único del alumno
+  @HiveField(0)
   final String id;
 
   /// Nombre completo del alumno
+  @HiveField(1)
   final String name;
 
   /// Apellido paterno del alumno
+  @HiveField(2)
   final String lastNameP;
 
   /// Apellido materno del alumno
+  @HiveField(3)
   final String lastNameM;
 
   /// Matricula del alumno
+  @HiveField(4)
   final String matriculation;
 
   /// Carrera del alumno
+  @HiveField(5)
   final String career;
 
   /// Turno del alumno
+  @HiveField(6)
   final String turno;
 
   /// QR del alumno
+  @HiveField(7)
   final String qr;
 
   Student({

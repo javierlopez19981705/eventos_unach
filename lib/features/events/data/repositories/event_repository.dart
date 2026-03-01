@@ -8,9 +8,16 @@ import 'package:eventos_unach/shared/utils/constants.dart';
 class EventRepository {
   late Box<Event> _eventsBox;
 
-  /// Inicializa el repositorio abriendo la caja de Hive
+  /// Inicializa el repositorio abriendo la caja de Hive.
+  /// Si los datos almacenados son incompatibles, limpia la caja y la reabre.
   Future<void> init() async {
-    _eventsBox = await Hive.openBox<Event>(AppConstants.eventsBoxName);
+    try {
+      _eventsBox = await Hive.openBox<Event>(AppConstants.eventsBoxName);
+    } catch (e) {
+      // Datos incompatibles con el esquema actual, limpiar y reabrir
+      await Hive.deleteBoxFromDisk(AppConstants.eventsBoxName);
+      _eventsBox = await Hive.openBox<Event>(AppConstants.eventsBoxName);
+    }
   }
 
   /// Obtiene la referencia a la caja (debe estar abierta)

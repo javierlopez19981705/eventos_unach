@@ -186,15 +186,15 @@ class EventDetailScreen extends StatelessWidget {
                             alpha: 0.12,
                           ),
                           child: Text(
-                            record.studentName[0].toUpperCase(),
+                            record.student.name[0].toUpperCase(),
                             style: TextStyle(
                               color: theme.colorScheme.primary,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
-                        title: Text(record.studentName),
-                        subtitle: Text('ID: ${record.studentId}'),
+                        title: Text(record.student.name),
+                        subtitle: Text('ID: ${record.student.id}'),
                         trailing: Text(
                           DateFormat('HH:mm').format(record.scannedAt),
                           style: theme.textTheme.bodySmall,

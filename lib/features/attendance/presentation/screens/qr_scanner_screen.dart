@@ -4,6 +4,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:provider/provider.dart';
 import 'package:eventos_unach/features/attendance/domain/attendance_provider.dart';
 import 'package:eventos_unach/features/attendance/data/models/student_model.dart';
+import 'package:eventos_unach/features/events/domain/event_provider.dart';
 
 /// Pantalla de escáner QR para registrar asistencia.
 /// Usa la cámara del dispositivo para leer códigos QR con datos de alumnos.
@@ -40,37 +41,55 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
         // Intentar parsear como datos de alumno JSON
         final student = Student.fromQrData(rawValue);
         final provider = context.read<AttendanceProvider>();
-        final registered = provider.registerStudent(student);
+        final eventProvider = context.read<EventProvider>();
+        final event = eventProvider.getEventById(widget.eventId);
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              registered
-                  ? '✅ ${student.name} registrado exitosamente'
-                  : '⚠️ ${student.name} ya está registrado',
-            ),
-            backgroundColor: registered ? Colors.green : Colors.orange,
-            duration: const Duration(seconds: 2),
-          ),
-        );
+        if (event == null) {
+          _showSnackBar('❌ Evento no encontrado', Colors.red);
+          return;
+        }
+
+        final result = provider.registerStudent(student, event);
+
+        final String message;
+        final Color color;
+
+        switch (result) {
+          case RegistrationResult.success:
+            message = '✅ ${student.name} registrado exitosamente';
+            color = Colors.green;
+          case RegistrationResult.alreadyRegisteredToday:
+            message = '⚠️ ${student.name} ya está registrado hoy';
+            color = Colors.orange;
+          case RegistrationResult.outsideDateRange:
+            message = '❌ Fuera del rango de fechas del evento';
+            color = Colors.red;
+        }
+
+        _showSnackBar(message, color);
 
         // Pequeña pausa para evitar lecturas duplicadas
         Future.delayed(const Duration(seconds: 2), () {
           if (mounted) setState(() => _isProcessing = false);
         });
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('❌ QR no válido.'),
-            backgroundColor: Colors.red,
-            duration: Duration(seconds: 2),
-          ),
-        );
+        _showSnackBar('❌ QR no válido.', Colors.red);
         Future.delayed(const Duration(seconds: 2), () {
           if (mounted) setState(() => _isProcessing = false);
         });
       }
     }
+  }
+
+  /// Muestra un SnackBar con mensaje y color
+  void _showSnackBar(String message, Color color) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: color,
+        duration: const Duration(seconds: 2),
+      ),
+    );
   }
 
   @override

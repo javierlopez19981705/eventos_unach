@@ -5,6 +5,7 @@ import 'package:printing/printing.dart';
 import 'package:intl/intl.dart';
 import 'package:eventos_unach/features/events/domain/event_provider.dart';
 import 'package:eventos_unach/features/events/data/models/event_model.dart';
+import 'package:eventos_unach/features/attendance/data/models/student_model.dart';
 import 'package:eventos_unach/features/diploma/data/diploma_generator.dart';
 import 'package:eventos_unach/shared/widgets/empty_state.dart';
 
@@ -53,24 +54,30 @@ class _DiplomaScreenState extends State<DiplomaScreen> {
     }
   }
 
-  /// Genera diplomas para todos los asistentes de un evento
+  /// Genera diplomas para los asistentes elegibles de un evento
   Future<void> _generateAllDiplomas(Event event) async {
-    if (event.attendanceRecords.isEmpty) {
+    final eligibleStudents = event.getEligibleStudents();
+
+    if (eligibleStudents.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('No hay asistentes registrados en este evento'),
+        SnackBar(
+          content: Text(
+            event.attendanceRecords.isEmpty
+                ? 'No hay asistentes registrados en este evento'
+                : 'Ningún alumno asistió los ${event.totalEventDays} día(s) del evento',
+          ),
           backgroundColor: Colors.orange,
         ),
       );
       return;
     }
 
-    // Mostrar diálogo para seleccionar alumno
-    _showStudentSelector(event);
+    // Mostrar diálogo para seleccionar alumno elegible
+    _showStudentSelector(event, eligibleStudents);
   }
 
-  /// Diálogo para seleccionar el alumno al que se le generará el diploma
-  void _showStudentSelector(Event event) {
+  /// Diálogo para seleccionar el alumno elegible al que se le generará el diploma
+  void _showStudentSelector(Event event, List<Student> eligibleStudents) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -98,33 +105,43 @@ class _DiplomaScreenState extends State<DiplomaScreen> {
                 ),
                 Padding(
                   padding: const EdgeInsets.all(16),
-                  child: Text(
-                    'Selecciona un alumno',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                  child: Column(
+                    children: [
+                      Text(
+                        'Alumnos elegibles para diploma',
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Asistieron los ${event.totalEventDays} día(s) del evento',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 const Divider(height: 1),
                 Expanded(
                   child: ListView.builder(
                     controller: scrollController,
-                    itemCount: event.attendanceRecords.length,
+                    itemCount: eligibleStudents.length,
                     itemBuilder: (context, index) {
-                      final record = event.attendanceRecords[index];
+                      final student = eligibleStudents[index];
                       return ListTile(
                         leading: CircleAvatar(
-                          child: Text(record.studentName[0].toUpperCase()),
+                          child: Text(student.name[0].toUpperCase()),
                         ),
-                        title: Text(record.studentName),
-                        subtitle: Text('ID: ${record.studentId}'),
+                        title: Text(student.name),
+                        subtitle: Text('ID: ${student.id}'),
                         trailing: const Icon(
                           Icons.picture_as_pdf_rounded,
                           color: Colors.red,
                         ),
                         onTap: () {
                           Navigator.of(context).pop();
-                          _generateDiploma(event, record.studentName);
+                          _generateDiploma(event, student.name);
                         },
                       );
                     },
@@ -241,7 +258,7 @@ class _DiplomaScreenState extends State<DiplomaScreen> {
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
-                                  '${event.attendanceRecords.length} asistente(s)',
+                                  '${event.getEligibleStudents().length} elegible(s) de ${event.attendanceRecords.length} asistente(s)',
                                   style: theme.textTheme.bodySmall?.copyWith(
                                     color: Colors.grey[600],
                                   ),

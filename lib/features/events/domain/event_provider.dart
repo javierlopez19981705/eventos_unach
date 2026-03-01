@@ -114,7 +114,7 @@ class EventProvider extends ChangeNotifier {
       if (event != null) {
         // Verificar si el alumno ya está registrado
         final alreadyExists = event.attendanceRecords.any(
-          (r) => r.studentId == record.studentId,
+          (r) => r.student.id == record.student.id,
         );
         if (!alreadyExists) {
           final updatedRecords = [...event.attendanceRecords, record];

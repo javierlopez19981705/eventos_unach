@@ -1,8 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:eventos_unach/features/attendance/data/models/attendance_record_model.dart';
 import 'package:eventos_unach/features/attendance/data/models/student_model.dart';
+import 'package:eventos_unach/features/events/data/models/event_model.dart';
 
 import '../../../shared/utils/extensions_date.dart';
+
+/// Resultado del intento de registro de asistencia
+enum RegistrationResult {
+  /// Registro exitoso
+  success,
+
+  /// El alumno ya fue registrado hoy
+  alreadyRegisteredToday,
+
+  /// La fecha actual está fuera del rango del evento
+  outsideDateRange,
+}
 
 /// Provider que gestiona el estado de la sesión de asistencia activa.
 /// Controla la lista de alumnos registrados durante un evento en curso.
@@ -36,33 +49,52 @@ class AttendanceProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Registra un alumno en la sesión actual a partir de datos del QR
-  bool registerStudent(Student student) {
-    // Verificar si ya está registrado
-    final alreadyRegistered = _currentRecords.any(
-      (r) =>
-          r.studentId == student.id &&
-          r.scannedAt.formattedDate == DateTime.now().formattedDate,
+  /// Registra un alumno en la sesión actual.
+  /// Reglas:
+  /// - El alumno puede asistir varias veces al mismo evento (en días distintos).
+  /// - Solo puede registrarse una vez por día.
+  /// - Solo puede registrarse dentro del rango de fechas del evento (date - dateEnd).
+  RegistrationResult registerStudent(Student student, Event event) {
+    final now = DateTime.now();
+
+    // Verificar que la fecha actual esté dentro del rango del evento
+    final todayDate = DateTime(now.year, now.month, now.day);
+    final eventStart = DateTime(
+      event.date.year,
+      event.date.month,
+      event.date.day,
+    );
+    final eventEnd = DateTime(
+      event.dateEnd.year,
+      event.dateEnd.month,
+      event.dateEnd.day,
     );
 
-    if (alreadyRegistered) {
-      return false; // Ya registrado
+    if (todayDate.isBefore(eventStart) || todayDate.isAfter(eventEnd)) {
+      return RegistrationResult.outsideDateRange;
     }
 
-    final record = AttendanceRecord(
-      studentId: student.id,
-      studentName: student.name,
-      scannedAt: DateTime.now(),
+    // Verificar si ya está registrado hoy
+    final alreadyRegisteredToday = _currentRecords.any(
+      (r) =>
+          r.student.id == student.id &&
+          r.scannedAt.formattedDate == now.formattedDate,
     );
+
+    if (alreadyRegisteredToday) {
+      return RegistrationResult.alreadyRegisteredToday;
+    }
+
+    final record = AttendanceRecord(student: student, scannedAt: now);
 
     _currentRecords.add(record);
     notifyListeners();
-    return true;
+    return RegistrationResult.success;
   }
 
   /// Elimina un registro de asistencia de la sesión actual
   void removeRecord(String studentId) {
-    _currentRecords.removeWhere((r) => r.studentId == studentId);
+    _currentRecords.removeWhere((r) => r.student.id == studentId);
     notifyListeners();
   }
 

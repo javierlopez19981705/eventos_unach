@@ -19,8 +19,6 @@ class AttendanceScreen extends StatefulWidget {
 }
 
 class _AttendanceScreenState extends State<AttendanceScreen> {
-  late Timer _clockTimer;
-
   @override
   void initState() {
     super.initState();
@@ -41,7 +39,6 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
 
   @override
   void dispose() {
-    _clockTimer.cancel();
     super.dispose();
   }
 
@@ -237,11 +234,11 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                           ),
                         ),
                         title: Text(
-                          record.studentName,
+                          record.student.name,
                           style: const TextStyle(fontWeight: FontWeight.w600),
                         ),
                         subtitle: Text(
-                          'ID: ${record.studentId} • ${DateFormat('HH:mm').format(record.scannedAt)}',
+                          'ID: ${record.student.id} • ${DateFormat('HH:mm').format(record.scannedAt)}',
                         ),
                         trailing: IconButton(
                           icon: const Icon(
@@ -249,7 +246,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                             color: Colors.red,
                           ),
                           onPressed: () =>
-                              provider.removeRecord(record.studentId),
+                              provider.removeRecord(record.student.id),
                           tooltip: 'Eliminar registro',
                         ),
                       ),
