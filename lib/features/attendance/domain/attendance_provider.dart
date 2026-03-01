@@ -16,6 +16,9 @@ enum RegistrationResult {
 
   /// La fecha actual está fuera del rango del evento
   outsideDateRange,
+
+  /// La hora actual está fuera del horario del evento
+  outsideTimeRange,
 }
 
 /// Provider que gestiona el estado de la sesión de asistencia activa.
@@ -78,6 +81,13 @@ class AttendanceProvider extends ChangeNotifier {
 
     if (todayDate.isBefore(eventStart) || todayDate.isAfter(eventEnd)) {
       return RegistrationResult.outsideDateRange;
+    }
+
+    // Verificar que la hora actual esté dentro del horario del evento
+    final currentMinutes = now.hour * 60 + now.minute;
+    if (currentMinutes < event.entryTimeMinutes ||
+        currentMinutes > event.exitTimeMinutes) {
+      return RegistrationResult.outsideTimeRange;
     }
 
     // Verificar si ya está registrado hoy
