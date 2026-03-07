@@ -11,17 +11,33 @@ class AttendanceRecord extends HiveObject {
   @HiveField(0)
   final Student student;
 
-  /// Fecha y hora en que se escaneó/registró al alumno
+  /// Fecha y hora de entrada (primer escaneo del día)
   @HiveField(1)
   final DateTime scannedAt;
 
-  AttendanceRecord({required this.student, required this.scannedAt});
+  /// Fecha y hora de salida (segundo escaneo del día), null si aún no salió
+  @HiveField(2)
+  DateTime? exitAt;
+
+  AttendanceRecord({
+    required this.student,
+    required this.scannedAt,
+    this.exitAt,
+  });
+
+  /// Indica si el alumno ya registró su salida
+  bool get hasExit => exitAt != null;
 
   /// Crea una copia del registro con campos opcionales modificados
-  AttendanceRecord copyWith({Student? student, DateTime? scannedAt}) {
+  AttendanceRecord copyWith({
+    Student? student,
+    DateTime? scannedAt,
+    DateTime? exitAt,
+  }) {
     return AttendanceRecord(
       student: student ?? this.student,
       scannedAt: scannedAt ?? this.scannedAt,
+      exitAt: exitAt ?? this.exitAt,
     );
   }
 
@@ -30,6 +46,7 @@ class AttendanceRecord extends HiveObject {
     return {
       'student': student.toJson(),
       'scannedAt': scannedAt.toIso8601String(),
+      'exitAt': exitAt?.toIso8601String(),
     };
   }
 
@@ -38,6 +55,9 @@ class AttendanceRecord extends HiveObject {
     return AttendanceRecord(
       student: Student.fromJson(json['student'] as Map<String, dynamic>),
       scannedAt: DateTime.parse(json['scannedAt'] as String),
+      exitAt: json['exitAt'] != null
+          ? DateTime.parse(json['exitAt'] as String)
+          : null,
     );
   }
 }

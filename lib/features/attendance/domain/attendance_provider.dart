@@ -8,11 +8,14 @@ import '../../../shared/utils/extensions_date.dart';
 
 /// Resultado del intento de registro de asistencia
 enum RegistrationResult {
-  /// Registro exitoso
-  success,
+  /// Registro de entrada exitoso
+  entrySuccess,
 
-  /// El alumno ya fue registrado hoy
-  alreadyRegisteredToday,
+  /// Registro de salida exitoso
+  exitSuccess,
+
+  /// El alumno ya registró entrada y salida hoy
+  alreadyCompletedToday,
 
   /// La fecha actual está fuera del rango del evento
   outsideDateRange,
@@ -61,8 +64,10 @@ class AttendanceProvider extends ChangeNotifier {
   /// Registra un alumno en la sesión actual.
   /// Reglas:
   /// - El alumno puede asistir varias veces al mismo evento (en días distintos).
-  /// - Solo puede registrarse una vez por día.
-  /// - Solo puede registrarse dentro del rango de fechas del evento (date - dateEnd).
+  /// - Primer escaneo del día = registro de entrada.
+  /// - Segundo escaneo del día = registro de salida.
+  /// - Solo puede registrarse dentro del rango de fechas del evento.
+  /// - Solo puede registrarse dentro del horario del evento.
   RegistrationResult registerStudent(Student student, Event event) {
     final now = DateTime.now();
 
@@ -90,23 +95,34 @@ class AttendanceProvider extends ChangeNotifier {
       return RegistrationResult.outsideTimeRange;
     }
 
-    // Verificar si ya está registrado hoy
-    final alreadyRegisteredToday = _currentRecords.any(
+    // Buscar si ya tiene un registro hoy
+    final todayRecordIndex = _currentRecords.indexWhere(
       (r) =>
           r.student.id == student.id &&
           r.scannedAt.formattedDate == now.formattedDate,
     );
 
-    if (alreadyRegisteredToday) {
-      return RegistrationResult.alreadyRegisteredToday;
+    if (todayRecordIndex == -1) {
+      // No tiene registro hoy → registrar ENTRADA
+      final record = AttendanceRecord(student: student, scannedAt: now);
+      _currentRecords.add(record);
+      _persistRecords();
+      notifyListeners();
+      return RegistrationResult.entrySuccess;
     }
 
-    final record = AttendanceRecord(student: student, scannedAt: now);
+    final todayRecord = _currentRecords[todayRecordIndex];
 
-    _currentRecords.add(record);
-    _persistRecords();
-    notifyListeners();
-    return RegistrationResult.success;
+    if (!todayRecord.hasExit) {
+      // Ya tiene entrada pero no salida → registrar SALIDA
+      todayRecord.exitAt = now;
+      _persistRecords();
+      notifyListeners();
+      return RegistrationResult.exitSuccess;
+    }
+
+    // Ya tiene entrada y salida hoy
+    return RegistrationResult.alreadyCompletedToday;
   }
 
   /// Elimina un registro de asistencia de la sesión actual

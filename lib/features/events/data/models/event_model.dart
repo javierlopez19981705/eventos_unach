@@ -67,27 +67,34 @@ class Event extends HiveObject {
   }
 
   /// Retorna la lista de alumnos elegibles para diploma.
-  /// Solo son elegibles los alumnos que asistieron TODOS los días del evento.
+  /// Solo son elegibles los alumnos que asistieron TODOS los días del evento
+  /// Y que registraron tanto entrada como salida cada día.
   List<Student> getEligibleStudents() {
     final requiredDays = totalEventDays;
 
-    // Agrupar registros por studentId y contar días únicos
-    final Map<String, Set<String>> studentDays = {};
+    // Agrupar registros por studentId y contar días con entrada Y salida
+    final Map<String, Set<String>> studentCompleteDays = {};
     final Map<String, Student> studentMap = {};
 
     for (final record in attendanceRecords) {
       final studentId = record.student.id;
+
+      // Solo contar si tiene entrada Y salida
+      if (!record.hasExit) continue;
+
       final dayKey =
           '${record.scannedAt.year}-${record.scannedAt.month}-${record.scannedAt.day}';
 
-      studentDays.putIfAbsent(studentId, () => {});
-      studentDays[studentId]!.add(dayKey);
+      studentCompleteDays.putIfAbsent(studentId, () => {});
+      studentCompleteDays[studentId]!.add(dayKey);
       studentMap[studentId] = record.student;
     }
 
-    // Filtrar solo los que asistieron todos los días
+    // Filtrar solo los que completaron todos los días
     return studentMap.entries
-        .where((entry) => studentDays[entry.key]!.length >= requiredDays)
+        .where(
+          (entry) => studentCompleteDays[entry.key]!.length >= requiredDays,
+        )
         .map((entry) => entry.value)
         .toList();
   }

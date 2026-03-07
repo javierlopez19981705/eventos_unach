@@ -238,7 +238,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                           style: const TextStyle(fontWeight: FontWeight.w600),
                         ),
                         subtitle: Text(
-                          '${record.student.matriculation} \n ${DateFormat('dd/MM/yyyy hh:mm a').format(record.scannedAt)}',
+                          '${record.student.matriculation}\nEntrada: ${DateFormat('dd/MM/yyyy hh:mm a').format(record.scannedAt)}\nSalida: ${record.hasExit ? DateFormat('dd/MM/yyyy hh:mm a').format(record.exitAt!) : '—'}',
                         ),
                         trailing: IconButton(
                           icon: const Icon(

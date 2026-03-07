@@ -19,17 +19,20 @@ class AttendanceRecordAdapter extends TypeAdapter<AttendanceRecord> {
     return AttendanceRecord(
       student: fields[0] as Student,
       scannedAt: fields[1] as DateTime,
+      exitAt: fields[2] as DateTime?,
     );
   }
 
   @override
   void write(BinaryWriter writer, AttendanceRecord obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(3)
       ..writeByte(0)
       ..write(obj.student)
       ..writeByte(1)
-      ..write(obj.scannedAt);
+      ..write(obj.scannedAt)
+      ..writeByte(2)
+      ..write(obj.exitAt);
   }
 
   @override

@@ -55,11 +55,14 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
         final Color color;
 
         switch (result) {
-          case RegistrationResult.success:
-            message = '✅ ${student.name} registrado exitosamente';
+          case RegistrationResult.entrySuccess:
+            message = '✅ ${student.name} - Entrada registrada';
             color = Colors.green;
-          case RegistrationResult.alreadyRegisteredToday:
-            message = '⚠️ ${student.name} ya está registrado hoy';
+          case RegistrationResult.exitSuccess:
+            message = '✅ ${student.name} - Salida registrada';
+            color = Colors.blue;
+          case RegistrationResult.alreadyCompletedToday:
+            message = '⚠️ ${student.name} ya registró entrada y salida hoy';
             color = Colors.orange;
           case RegistrationResult.outsideDateRange:
             message = '❌ Fuera del rango de fechas del evento';
