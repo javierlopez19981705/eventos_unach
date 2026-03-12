@@ -24,6 +24,7 @@ class EventAdapter extends TypeAdapter<Event> {
       entryTimeMinutes: fields[3] as int,
       exitTimeMinutes: fields[4] as int,
       attendanceRecords: (fields[5] as List?)?.cast<AttendanceRecord>(),
+      dailySchedules: (fields[8] as List?)?.cast<DaySchedule>(),
       isCompleted: fields[6] as bool,
     );
   }
@@ -31,7 +32,7 @@ class EventAdapter extends TypeAdapter<Event> {
   @override
   void write(BinaryWriter writer, Event obj) {
     writer
-      ..writeByte(8)
+      ..writeByte(9)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -47,7 +48,9 @@ class EventAdapter extends TypeAdapter<Event> {
       ..writeByte(6)
       ..write(obj.isCompleted)
       ..writeByte(7)
-      ..write(obj.dateEnd);
+      ..write(obj.dateEnd)
+      ..writeByte(8)
+      ..write(obj.dailySchedules);
   }
 
   @override

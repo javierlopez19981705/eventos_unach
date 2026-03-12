@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:eventos_unach/features/events/data/models/event_model.dart';
+import 'package:eventos_unach/features/events/data/models/day_schedule_model.dart';
 import 'package:eventos_unach/features/events/data/repositories/event_repository.dart';
 import 'package:eventos_unach/features/attendance/data/models/attendance_record_model.dart';
 import 'package:uuid/uuid.dart';
@@ -56,21 +57,24 @@ class EventProvider extends ChangeNotifier {
     required String name,
     required DateTime date,
     required DateTime dateEnd,
-    required TimeOfDay entryTime,
-    required TimeOfDay exitTime,
+    required List<DaySchedule> dailySchedules,
   }) async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
+      // Usar el primer horario como valores legacy
+      final firstSchedule = dailySchedules.first;
+
       final event = Event(
         id: _uuid.v4(),
         name: name,
         date: date,
         dateEnd: dateEnd,
-        entryTimeMinutes: Event.timeOfDayToMinutes(entryTime),
-        exitTimeMinutes: Event.timeOfDayToMinutes(exitTime),
+        entryTimeMinutes: firstSchedule.entryTimeMinutes,
+        exitTimeMinutes: firstSchedule.exitTimeMinutes,
+        dailySchedules: dailySchedules,
       );
 
       await _repository.saveEvent(event);

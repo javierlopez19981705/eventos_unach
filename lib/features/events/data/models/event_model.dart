@@ -2,6 +2,7 @@ import 'package:hive/hive.dart';
 import 'package:flutter/material.dart';
 import 'package:eventos_unach/features/attendance/data/models/attendance_record_model.dart';
 import 'package:eventos_unach/features/attendance/data/models/student_model.dart';
+import 'package:eventos_unach/features/events/data/models/day_schedule_model.dart';
 
 part 'event_model.g.dart';
 
@@ -40,6 +41,10 @@ class Event extends HiveObject {
   @HiveField(7)
   final DateTime dateEnd;
 
+  /// Horarios por día del evento
+  @HiveField(8)
+  final List<DaySchedule> dailySchedules;
+
   Event({
     required this.id,
     required this.name,
@@ -48,8 +53,10 @@ class Event extends HiveObject {
     required this.entryTimeMinutes,
     required this.exitTimeMinutes,
     List<AttendanceRecord>? attendanceRecords,
+    List<DaySchedule>? dailySchedules,
     this.isCompleted = false,
-  }) : attendanceRecords = attendanceRecords ?? [];
+  })  : attendanceRecords = attendanceRecords ?? [],
+        dailySchedules = dailySchedules ?? [];
 
   /// Convierte los minutos almacenados a TimeOfDay para la UI
   TimeOfDay get entryTime =>
@@ -99,6 +106,18 @@ class Event extends HiveObject {
         .toList();
   }
 
+  /// Obtiene el horario del día específico, o null si no existe
+  DaySchedule? getScheduleForDate(DateTime date) {
+    final targetDay = DateTime(date.year, date.month, date.day);
+    try {
+      return dailySchedules.firstWhere(
+        (s) => DateTime(s.date.year, s.date.month, s.date.day) == targetDay,
+      );
+    } catch (_) {
+      return null;
+    }
+  }
+
   /// Helper para crear minutos desde un TimeOfDay
   static int timeOfDayToMinutes(TimeOfDay time) {
     return time.hour * 60 + time.minute;
@@ -113,6 +132,7 @@ class Event extends HiveObject {
     int? entryTimeMinutes,
     int? exitTimeMinutes,
     List<AttendanceRecord>? attendanceRecords,
+    List<DaySchedule>? dailySchedules,
     bool? isCompleted,
   }) {
     return Event(
@@ -123,6 +143,7 @@ class Event extends HiveObject {
       entryTimeMinutes: entryTimeMinutes ?? this.entryTimeMinutes,
       exitTimeMinutes: exitTimeMinutes ?? this.exitTimeMinutes,
       attendanceRecords: attendanceRecords ?? this.attendanceRecords,
+      dailySchedules: dailySchedules ?? this.dailySchedules,
       isCompleted: isCompleted ?? this.isCompleted,
     );
   }

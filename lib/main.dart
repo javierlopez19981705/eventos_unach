@@ -5,6 +5,7 @@ import 'package:eventos_unach/app/providers.dart';
 import 'package:eventos_unach/shared/theme.dart';
 import 'package:eventos_unach/shared/utils/constants.dart';
 import 'package:eventos_unach/features/events/data/models/event_model.dart';
+import 'package:eventos_unach/features/events/data/models/day_schedule_model.dart';
 import 'package:eventos_unach/features/attendance/data/models/attendance_record_model.dart';
 import 'package:eventos_unach/features/attendance/data/models/student_model.dart';
 import 'package:eventos_unach/features/events/data/repositories/event_repository.dart';
@@ -20,6 +21,7 @@ void main() async {
   await Hive.initFlutter();
 
   // Registrar adaptadores de Hive para los modelos
+  Hive.registerAdapter(DayScheduleAdapter());
   Hive.registerAdapter(StudentAdapter());
   Hive.registerAdapter(AttendanceRecordAdapter());
   Hive.registerAdapter(EventAdapter());

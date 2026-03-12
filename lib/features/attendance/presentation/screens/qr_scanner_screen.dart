@@ -67,9 +67,14 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
           case RegistrationResult.outsideDateRange:
             message = '❌ Fuera del rango de fechas del evento';
             color = Colors.red;
-          case RegistrationResult.outsideTimeRange:
-            message =
-                '❌ Fuera del horario del evento (${event.entryTime.format(context)} - ${event.exitTime.format(context)})';
+          case RegistrationResult.noScheduleForToday:
+            message = '❌ No hay horario configurado para hoy';
+            color = Colors.red;
+          case RegistrationResult.outsideEntryTimeRange:
+            message = '❌ Fuera del horario de entrada';
+            color = Colors.red;
+          case RegistrationResult.outsideExitTimeRange:
+            message = '❌ Fuera del horario de salida';
             color = Colors.red;
         }
 

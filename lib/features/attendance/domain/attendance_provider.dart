@@ -20,8 +20,16 @@ enum RegistrationResult {
   /// La fecha actual está fuera del rango del evento
   outsideDateRange,
 
-  /// La hora actual está fuera del horario del evento
-  outsideTimeRange,
+  /// No hay horario configurado para hoy
+  noScheduleForToday,
+
+  /// La hora actual está fuera del rango de entrada
+  /// (30 min antes → 1 hr después de la hora de inicio)
+  outsideEntryTimeRange,
+
+  /// La hora actual está fuera del rango de salida
+  /// (20 min antes → 1 hr después de la hora de fin)
+  outsideExitTimeRange,
 }
 
 /// Provider que gestiona el estado de la sesión de asistencia activa.
@@ -63,11 +71,10 @@ class AttendanceProvider extends ChangeNotifier {
 
   /// Registra un alumno en la sesión actual.
   /// Reglas:
-  /// - El alumno puede asistir varias veces al mismo evento (en días distintos).
   /// - Primer escaneo del día = registro de entrada.
   /// - Segundo escaneo del día = registro de salida.
-  /// - Solo puede registrarse dentro del rango de fechas del evento.
-  /// - Solo puede registrarse dentro del horario del evento.
+  /// - Entrada: 30 min antes → 1 hr después de la hora de inicio del día.
+  /// - Salida: 20 min antes → 1 hr después de la hora de fin del día.
   RegistrationResult registerStudent(Student student, Event event) {
     final now = DateTime.now();
 
@@ -88,12 +95,13 @@ class AttendanceProvider extends ChangeNotifier {
       return RegistrationResult.outsideDateRange;
     }
 
-    // Verificar que la hora actual esté dentro del horario del evento
-    final currentMinutes = now.hour * 60 + now.minute;
-    if (currentMinutes < event.entryTimeMinutes ||
-        currentMinutes > event.exitTimeMinutes) {
-      return RegistrationResult.outsideTimeRange;
+    // Obtener el horario del día actual
+    final schedule = event.getScheduleForDate(now);
+    if (schedule == null) {
+      return RegistrationResult.noScheduleForToday;
     }
+
+    final currentMinutes = now.hour * 60 + now.minute;
 
     // Buscar si ya tiene un registro hoy
     final todayRecordIndex = _currentRecords.indexWhere(
@@ -103,7 +111,16 @@ class AttendanceProvider extends ChangeNotifier {
     );
 
     if (todayRecordIndex == -1) {
-      // No tiene registro hoy → registrar ENTRADA
+      // No tiene registro hoy → verificar ventana de ENTRADA
+      // Ventana: 30 min antes de inicio → 1 hr después de inicio
+      final entryWindowStart = schedule.entryTimeMinutes - 30;
+      final entryWindowEnd = schedule.entryTimeMinutes + 60;
+
+      if (currentMinutes < entryWindowStart || currentMinutes > entryWindowEnd) {
+        return RegistrationResult.outsideEntryTimeRange;
+      }
+
+      // Registrar ENTRADA
       final record = AttendanceRecord(student: student, scannedAt: now);
       _currentRecords.add(record);
       _persistRecords();
@@ -114,7 +131,16 @@ class AttendanceProvider extends ChangeNotifier {
     final todayRecord = _currentRecords[todayRecordIndex];
 
     if (!todayRecord.hasExit) {
-      // Ya tiene entrada pero no salida → registrar SALIDA
+      // Ya tiene entrada pero no salida → verificar ventana de SALIDA
+      // Ventana: 20 min antes de fin → 1 hr después de fin
+      final exitWindowStart = schedule.exitTimeMinutes - 20;
+      final exitWindowEnd = schedule.exitTimeMinutes + 60;
+
+      if (currentMinutes < exitWindowStart || currentMinutes > exitWindowEnd) {
+        return RegistrationResult.outsideExitTimeRange;
+      }
+
+      // Registrar SALIDA
       todayRecord.exitAt = now;
       _persistRecords();
       notifyListeners();
@@ -151,7 +177,6 @@ class AttendanceProvider extends ChangeNotifier {
   }
 
   /// Guarda los registros actuales en Hive asociados al evento activo.
-  /// Se ejecuta después de cada registro o eliminación.
   Future<void> _persistRecords() async {
     if (_activeEventId == null) return;
     try {
